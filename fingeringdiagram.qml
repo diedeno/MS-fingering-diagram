@@ -11,6 +11,7 @@
 // 20250910 adapted for MuseScore >= 4.4 by Diego Denolf (graffesmusic)
 // set version to 2.0
 // Needs an adapted Fiati font with Advance Width = 1, zero width fonts do not display properly in Qt6.x  
+// 20250916 denolfd : added fingerings for Brass instruments.
 //
 // license GPL-3.0
 //
@@ -28,6 +29,7 @@ MuseScore {
 	* Class constructor used to create a new musical part fingering containing its type, range,
 	* mapping, transposition, etc.
 	*/
+    
 	function fingeringConstructor(part) {
 		this.part = part || {};
 		this.instrument = null;
@@ -36,11 +38,13 @@ MuseScore {
 		this.base = '';
 		this.mapping = [];
 		this.allKeysPressed = '';
-
+        
+       
 		/**
 		* Populate dictionary mapping from notes pitch
 		* to character sequence in the font.
 		*/
+        
 		this._populate = function(instrument) {
 			if (instrument === 'wind.flutes.flute' || instrument === 'wind.flutes.flute.alto' || instrument === 'flute' || instrument === 'alto-flute') {
 				this.instrument = 'flute'; // Default: Flute
@@ -362,30 +366,294 @@ MuseScore {
 				} else if (instrument === 'wind.reed.xaphoon.d' || instrument === 'd-xaphoon') {
 					this.transpose = -2;
 				}
-			} else if (instrument === 'brass.trumpet'|| instrument === 'bb-trumpet') {	
-				// this.instrument = 'bb-trumpet'; // Default: Trumpet
-				this.range = {
-					minPitch: 55,
-					maxPitch: 82,
-				};
-			} else if (instrument === 'brass.trombone' || instrument === 'brass.trombone.alto' 
-				|| instrument === 'brass.trombone.tenor' || instrument === 'brass.trombone.bass'
-                || instrument === 'soprano-trombone'  || instrument === 'alto-trombone' || instrument === 'tenor-trombone'
-                || instrument === 'bass-trombone') {
-				// this.instrument = 'tenor-trombone'; // Default: Trombone
-				this.range = {
-					minPitch: 40,
-					maxPitch: 72,
-				};
-				if (instrument === 'brass.trombone.bass' || instrument === 'bass-trombone') {
-					this.transpose = 6;
-				}
+			
+            /////////////////////////////
+            /// TRUMPETS + SAXHORNS 
+            ///////////////////////////// 
+             
+             } else if (instrument === 'brass.trumpet' || instrument === 'bb-trumpet' || instrument === 'c-trumpet'
+               || instrument === 'eb-trumpet' || instrument === 'd-trumpet' || instrument === 'pocket-trumpet'
+               || instrument === 'bb-cornet' || instrument === 'eb-cornet' || instrument === 'flugelhorn'
+               || instrument === 'brass.trumpet.bflat' || instrument === 'brass.trumpet.c' || instrument === 'brass.trumpet.d'
+               || instrument === 'brass.trumpet.pocket' || instrument === 'brass.cornet' || instrument === 'brass.cornet.soprano'
+               || instrument === 'brass.flugelhorn' || instrument === 'brass.alto-horn' || instrument === 'eb-alto-horn' || instrument === 'baritone-horn'
+               || instrument === 'brass.baritone-horn' || instrument === 'baritone-horn-treble' || instrument === 'eb-bass-trumpet') {
+                this.instrument = 'c-trumpet';
+                this.range = { 
+                    minPitch: 54, 
+                    maxPitch: 84  
+                };
+                this.base = '\uE440'; 
+
+                // Define the basic valve symbols (1st, 2nd, 3rd)
+                var f = {
+                    0: '',
+                    1: '\uE441', // 1st valve
+                    2: '\uE442', // 2nd valve
+                    3: '\uE443'  // 3rd valve
+                };
+                              
+                // Create combinations 
+                f[12]  = f[1] + f[2];
+                f[13]  = f[1] + f[3];
+                f[23]  = f[2] + f[3];
+                f[123] = f[1] + f[2] + f[3];
+
+                this.mapping = [
+                    f[123], // F#3 (54)
+                    f[13],  // G3  (55)
+                    f[23],  // G#3 (56)
+                    f[12],   // A3  (57)
+                    f[1],   // A#3 (58)
+                    f[2],   // B3  (59)
+
+                    // Octave 4 (C4 to B4) 
+                    f[0],   // C4  (60) 
+                    f[123],   // C#4 (61)
+                    f[13],   // D4  (62)
+                    f[23],  // D#4 (63) 
+                    f[12],  // E4  (64) 
+                    f[1],  // F4  (65) 
+                    f[2], // F#4 (66)
+                    f[0],  // G4  (67) 
+                    f[23],  // G#4 (68)
+                    f[12],   // A4  (69) 
+                    f[1],   // A#4 (70)
+                    f[2],   // B4  (71) 
+
+                    // Octave 5 (C5 to B5) 
+                    f[0],   // C5  (72) 
+                    f[12],   // C#5 (73)
+                    f[1],   // D5  (74)
+                    f[2],  // D#5 (75) 
+                    f[0],  // E5  (76)
+                    f[1],  // F5  (77) 
+                    f[2], // F#5 (78)
+                    f[0],  // G5  (79) 
+                    f[23],  // G#5 (80)
+                    f[12],   // A5  (81) 
+                    f[1],   // A#5 (82)
+                    f[2],   // B5  (83) 
+
+                    // Octave 6 (C6 and above)
+                    f[0]    // C6  (84) 
+                    // Notes above this (C#6, D6) are possible but players capable of playing in this range certainly do not need a fingering diagram
+                ];
+                if (instrument === 'bb-trumpet'|| instrument === 'bb-cornet' || instrument === 'pocket-trumpet' || instrument === 'flugelhorn'
+                    || instrument === 'brass.trumpet.bflat' || instrument === 'brass.trumpet.pocket' || instrument === 'brass.cornet' || instrument === 'brass.flugelhorn') {
+					this.transpose = 2;
+                    }  
+                if (instrument === 'eb-trumpet' || instrument === 'eb-cornet' || instrument === 'brass.trumpet' || instrument === 'brass.cornet.soprano'){
+                        this.transpose = -3;
+                    }
+                if (instrument === 'd-trumpet' || instrument === 'brass.trumpet.d'){
+                        this.transpose = -2;
+                    }   
+                if (instrument === 'brass.alto-horn' || instrument === 'eb-alto-horn' || instrument === 'eb-bass-trumpet'){
+                        this.transpose = 9;
+                    }        
+                if (instrument === 'baritone-horn-treble'){
+                        this.transpose = 14;
+                    }  
+                          
+            ///////////////////////////
+            /// TROMBONE
+            ///////////////////////////           
+			
+                }  else if (instrument === 'brass.trombone' || instrument === 'brass.trombone.tenor' 
+                    || instrument === 'tenor-trombone' || instrument === 'trombone') {
+                    this.instrument = 'trombone';
+                    this.range = { 
+                        minPitch: 40, // Written E2 
+                        maxPitch: 72  // Written C5 
+                    };
+                    this.base = ''; 
+  
+
+                    // Define the position symbols. we use numbers in circles
+                    var p = {
+                        1: '\u2460', // 1
+                        2: '\u2461', // 2
+                        3: '\u2462', // 3
+                        4: '\u2463', // 4
+                        5: '\u2464', // 5
+                        6: '\u2465', // 6
+                        7: '\u2466'  // 7
+                    };
+
+                    // mapping from https://norlanbewley.com/bewleymusic/trombone-slide-position-chart/
+                    // The mapping array for written pitches from 40 (E2) to 72 (C5)
+                    this.mapping = [
+                        // Octave 2 (E2 to B2) - Trigger/valve notes are not included in this basic mapping
+                        p[7], // E2  (40)  
+                        p[6], // F2  (41)
+                        p[5], // F#2 (42) 
+                        p[4], // G2  (43)
+                        p[3], // G#2 (44)
+                        p[2], // A2  (45)
+                        p[1], // A#2 (46)
+                        p[7], // B2  (47)
+
+                        // Octave 3 (C3 to B3) - Standard Staff Notes
+                        p[6], // C3  (48) 
+                        p[5], // C#3 (49)
+                        p[4], // D3  (50)
+                        p[3], // D#3 (51) 
+                        p[2]+"\n"+p[7], // E3  (52)
+                        p[1]+"\n"+p[6], // F3  (53)
+                        p[5], // F#3 (54)
+                        p[4], // G3  (55)
+                        p[3]+"\n"+p[7], // G#3 (56) 
+                        p[2]+"\n"+p[6], // A3  (57)
+                        p[1]+"\n"+p[5], // A#3 (58) 
+                        p[4]+"\n"+p[7], // B3  (59) 
+
+                        // Octave 4 (C4 to C5) - Upper Staff
+                        p[3]+"\n"+p[6], // C4  (60) 
+                        p[2]+"\n"+p[5], // C#4 (61) 
+                        p[1]+"\n"+p[4]+"\n"+p[7], // D4  (62) 
+                        p[3]+"\n"+p[6], // D#4 (63) 
+                        p[2]+"\n"+p[5]+"\n"+p[7], // E4  (64) 
+                        p[1]+"\n"+p[4]+"\n"+p[6], // F4  (65) 
+                        p[3]+"\n"+p[5]+"\n"+p[7], // F#4 (66) 
+                        p[2]+"\n"+p[4]+"\n"+p[6], // G4  (67) 
+                        p[3]+"\n"+p[5]+"\n"+p[7], // G#4 (68) 
+                        p[2]+"\n"+p[4]+"\n"+p[6], // A4  (69) 
+                        p[1]+"\n"+p[3]+"\n"+p[5], // A#4 (70) 
+                        p[2]+"\n"+p[4]+"\n"+p[6], // B4  (71) 
+                        p[1]+"\n"+p[3]+"\n"+p[5]  // C5  (72) 
+                    ];
+                    
+                                
+            ////////////////////    
+            /// HORN F/Bb
+            ////////////////////
+                
 			} else if (instrument === 'brass.french-horn' || instrument === 'horn') {
-				this.instrument = 'horn'; // Default: French Horn
+				this.instrument = 'horn'; 
 				this.range = {
-					minPitch: 34,
-					maxPitch: 77,
+					minPitch: 41,
+					maxPitch: 69,
 				};
+                
+                this.base = '\uE446';
+                
+                var f = { 0: '', 1: '\uE447', 2: '\uE448', 3: '\uE449', 4: '', 5: '\uE441', 6: '\uE442', 7: '\uE443', 8: '\uE445' }; 
+                f[12]   = f[1]+f[2];
+                f[13]   = f[1]+f[3];
+				f[23]   = f[2]+f[3];
+                f[123]  = f[1]+f[2]+f[3];
+                f[568]   = f[5]+f[6]+f[8];
+                f[578]   = f[5]+f[7]+f[8];
+                f[678]   = f[6]+f[7]+f[8];
+                f[5678]  = f[5]+f[6]+f[7]+f[8];
+                f[78]    = f[7]+f[8];
+                f[68]    = f[6]+f[8];
+                f[58]   = f[5]+f[8];
+              
+               
+               
+                this.mapping = [
+                    f[13]+f[8],        // C (41)
+                    f[23]+f[5678],  // C#  (42)
+                    f[12]+f[578],   // D (43)
+                    f[1]+f[678],   // D# (44)
+                    f[2]+f[568],   // E (45)
+                    f[0]+f[58],     // F (46)
+                    f[123]+f[68],     // F# (47)
+                    f[13]+f[8],          // G (48)
+                    f[23]+f[678], // G# (49)
+                    f[12]+f[568],  // A (50)
+                    f[1]+f[58],     // A# (51)
+                    f[2]+f[68],     //  B (52)
+                    f[8],     // C (53)
+                    f[23]+f[568],    // C# (54)
+                    f[12]+f[58],     // D  (55)
+                    f[1]+f[68],     // D# (56)
+                    f[2]+f[8],    // E  (57)
+                    f[58],     // F (58)
+                    f[12]+f[68],    // F# (59)
+                    f[1]+f[8],     // G  (60)
+                    f[23]+f[678],    // G# (61)
+                    f[12]+f[568],     // A  (62)
+                    f[1]+f[58],     // A# (63)
+                    f[2]+f[68],    // B (64)
+                    f[8],         // C (65)
+                    f[23]+f[68],     // C# (66)
+                    f[12]+f[8],    // D  (67)
+                    f[1]+f[68],     // D# (68)
+                    f[2]+f[8],    // E  (69)
+                ];
+                
+                
+              
+                
+            ////////////////////    
+            /// EUPHONIUM 
+            ////////////////////
+            
+             } else if (instrument === 'brass.euphonium' || instrument === 'euphonium' || instrument === 'euphonium-treble'){
+                this.instrument = 'euphonium';
+                this.range = { 
+                    minPitch: 40, 
+                    maxPitch: 70  
+                };
+                this.base = '\uE444';     
+                var f = { 0: '', 1: '\uE441', 2: '\uE442', 3: '\uE443', 4: '\uE445'};
+                f[12]   = f[1]+f[2];
+                f[13]   = f[1]+f[3];
+				f[23]   = f[2]+f[3];
+				f[24]   = f[2]+f[4];
+				f[124]  = f[1]+f[2]+f[4];
+				f[134]  = f[1]+f[3]+f[4];
+				f[234]  = f[2]+f[3]+f[4];
+				f[1234] = f[1]+f[2]+f[3]+f[4];
+                
+                this.mapping = [
+                    f[24],    // E2  (40)
+                    f[13],   // F2  (41)
+                    f[23],  // F#2 (42)
+                    f[12],   // G2  (43)
+                    f[1],   // G#2 (44)
+                    f[2],   // A2  (45)
+                    f[0],    // A#2 (46)
+                    f[24],    // B2  (47)
+
+                    // Octave 3 (C3 to B3)
+                    f[13],    // C3  (48)
+                    f[23],  // C#3 (49)
+                    f[12],   // D3  (50)
+                    f[1],   // D#3 (51)
+                    f[2],   // E3  (52)
+                    f[0],    // F3  (53)
+                    f[23],    // F#3 (54)
+                    f[12],    // G3  (55)
+                    f[1],   // G#3 (56)
+                    f[2],   // A3  (57)
+                    f[0],    // A#3 (58)
+                    f[12],    // B3  (59)
+
+                    // Octave 4 (C4 to B4)
+                    f[1],    // C4  (60)
+                    f[2],  // C#4 (61)
+                    f[0],   // D4  (62)
+                    f[1],   // D#4 (63)
+                    f[2],   // E4  (64)
+                    f[0],    // F4  (65)
+                    f[23],    // F#4 (66)
+                    f[12],    // G4  (67)
+                    f[1],   // G#4 (68)
+                    f[2],   // A4  (69)
+                    f[0]    // A#4 (70)
+                    ];
+           
+         
+                
+            ////////////////    
+            /// TUBA
+            ////////////////
+            
+                
 			} else if (instrument === 'brass.tuba' || instrument === 'tuba') {
 				this.instrument = 'tuba'; // Default: Tuba
 				this.range = {
@@ -451,6 +719,7 @@ MuseScore {
 		}
 
 		this.instrumentId = this._getInstrumentId();
+       
 	}
 
 	property variant midiMapping : {
@@ -511,6 +780,7 @@ MuseScore {
 	function changeElement(element, fingering) {
 		element.text = fingering;
 		element.fontFace = 'Fiati';
+        element.fontSize = 42;
 		// LEFT = 0, RIGHT = 1, HCENTER = 2, TOP = 0, BOTTOM = 4, VCENTER = 8, BASELINE = 16
 		element.align = 2; // HCenter and top
 		// Set text to below the staff
@@ -520,6 +790,8 @@ MuseScore {
 
 		return element;
 	}
+
+   
     
  	function renderFingering() {
 		var fingering = null;
@@ -531,7 +803,8 @@ MuseScore {
 		var supportFingeringElement = (mscoreVersion >= 30500);
 		var staffChanged = 0;
 		var staffFound = [];
-
+        
+                    
 		if (supportFingeringElement) {
 			elementType = Element.FINGERING;
 		} else {
@@ -628,8 +901,17 @@ MuseScore {
 								// el.offsetY = offsetY;
 							}
 							el.fontSize = fontSize;
-							// TODO: improve the placing of element for different scenarios
+                            //TODO: improve the placing of element for different scenarios
 							changeElement(el, text);
+                          
+                            // If the text is trombone position, force 12pt
+                            //if (text >= '\u2460' && text <= '\u2466') {
+                            if ((text >= '\u2460' && text <= '\u2466') || text.indexOf('T') !== -1) {
+                                el.fontSize = 12;
+                                el.fontFace = "FreeSerif";
+                            }
+                            
+                            
 						}
 					}
 				} // end if CHORD
