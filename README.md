@@ -1,5 +1,7 @@
 # MS-fingering-diagram
-port of the MuseScore v3 Fingering diagram to MuseScore >=v4.4
+Port of the MuseScore v3 Fingering diagram to MuseScore >=v4.4
+
+Changed font (set Advance width to 1 instead 0) to make it usable in MuseScore 4x and 3.7 Evolution 
 
 # Changes
 
