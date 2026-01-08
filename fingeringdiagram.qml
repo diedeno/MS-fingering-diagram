@@ -287,7 +287,8 @@ MuseScore {
 					this.base += '\uE281';
 				}
 			} else if (instrument === 'wind.flutes.recorder' || instrument === 'wind.flutes.recorder.soprano'
-				|| instrument === 'wind.flutes.recorder.alto' || instrument === 'soprano-recorder' || instrument === 'alto-recorder') {
+				|| instrument === 'wind.flutes.recorder.alto' || instrument === 'soprano-recorder' || instrument === 'descant-recorder' 
+                || instrument === 'treble-recorder' || instrument === 'alto-recorder') {
 				this.instrument = 'soprano-recorder'; // Default: Soprano Recorder (Baroque/English)
 				this.range = {
 					minPitch: 72, // C4 (written)
